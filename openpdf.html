@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PDF.js Viewer with Page Navigation</title>
+    <style>
+        /* ここにスタイルを追加できます */
+        #the-canvas {
+            border: 1px solid black;
+            direction: ltr;
+        }
+    </style>
+</head>
+<body>
+    <h1>PDF Viewer</h1>
+    <canvas id="the-canvas"></canvas>
+    <!-- PDF.jsのライブラリを読み込む -->
+    <script src="https://mozilla.github.io/pdf.js/build/pdf.js"></script>
+    <script>
+    var pdfjsLib = window['pdfjs-dist/build/pdf'];
+    // ライブラリの初期設定
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://mozilla.github.io/pdf.js/build/pdf.worker.js';
+
+    </script>
+
+    <script>
+        // URLからページ数を取得する関数
+        function getQueryParam(name, defaultValue = 1) {
+            const params = new URLSearchParams(window.location.search);
+            const page = parseInt(params.get(name), 10);
+            return isNaN(page) ? defaultValue : page;  // パラメータが不正または存在しない場合はデフォルト値を返す
+        }
+
+        // PDF.jsを使ってPDFをロードし、指定されたページを表示する関数
+        function renderPage(pdf, pageNumber) {
+            pdf.getPage(pageNumber).then(function(page) {
+                var scale = 1.5;
+                var viewport = page.getViewport({scale: scale});
+                var canvas = document.getElementById('the-canvas');
+                var context = canvas.getContext('2d');
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+
+                var renderContext = {
+                    canvasContext: context,
+                    viewport: viewport
+                };
+                page.render(renderContext);
+            });
+        }
+
+        // メインロジック
+        var url = '/Users/takuwatokuichirou/Desktop/土木工事施工管理基準及び規格値.pdf';  // PDFファイルのURL
+        var pageNumber = getQueryParam('page');  // URLからページ番号を取得
+
+        pdfjsLib.getDocument(url).promise.then(function(pdf) {
+            renderPage(pdf, pageNumber);
+        });
+    </script>
+</body>
+</html>
