@@ -15727,7 +15727,7 @@ function appendText(task, geom, styles) {
     canvasWidth: 0,
     hasText: geom.str !== "",
     hasEOL: geom.hasEOL,
-    fontSize: 0
+    fontSize: 0,
   };
   task._textDivs.push(textDiv);
   const tx = _shared_util_js__WEBPACK_IMPORTED_MODULE_0__.Util.transform(task._transform, geom.transform);
@@ -15760,7 +15760,45 @@ function appendText(task, geom, styles) {
   divStyle.fontFamily = fontFamily;
   textDivProperties.fontSize = fontHeight;
   textDiv.setAttribute("role", "presentation");
-  textDiv.textContent = geom.str;
+
+
+  // 強調表示する単語とリンクの配列
+  const targetWords = [
+    { word: "3-2-3-3", url: "./viewer.html?file=./pdf/ministry_comdoc.pdf#page=203" },
+    { word: "3-2-4-3", url: "./viewer.html?file=./pdf/ministry_comdoc.pdf#page=240" },
+    { word: "3-2-3-4", url: "./viewer.html?file=./pdf/ministry_comdoc.pdf#page=205" },
+    { word: "3-2-4-2", url: "./viewer.html?file=./pdf/ministry_comdoc.pdf#page=239" },
+    { word: "3-2-3-20", url: "./viewer.html?file=./pdf/ministry_comdoc.pdf#page=219" }
+  ];
+
+  // 強調表示する単語ごとに処理
+  targetWords.forEach(target => {
+    if (geom.str.includes(target.word)) {
+      const parts = geom.str.split(new RegExp(`(${target.word})`, 'g'));
+      parts.forEach((part, index) => {
+        const span = document.createElement("span");
+        if (part === target.word) {
+          span.style.borderBottom = "5px solid blue"; // 太い青い下線を追加
+          // span.style.backgroundColor = "yellow"; // 黄色のマーカー線を追加
+          span.style.cursor = "pointer"; // カーソルをポインターに変更
+          span.onclick = () => window.location.href = target.url; // リンク先を設定
+          span.textContent = part;
+        } else {
+          span.textContent = part;
+        }
+        span.style.position = "relative"; // 相対位置を使用
+        span.style.left = `${index === 0 ? 0 : 'auto'}`; // 最初の部分だけ左をリセット
+        span.style.top = "0"; // 上の位置をリセット
+        textDiv.appendChild(span);
+      });
+      geom.str = ""; // 処理済みの文字列をクリア
+    }
+  });
+
+  if (geom.str !== "") {
+    textDiv.textContent = geom.str;
+  }
+  
   textDiv.dir = geom.dir;
   if (task._fontInspectorEnabled) {
     textDiv.dataset.fontName = style.fontSubstitutionLoadedName || geom.fontName;
@@ -15786,6 +15824,7 @@ function appendText(task, geom, styles) {
     task._layoutText(textDiv);
   }
 }
+
 function layout(params) {
   const {
     div,
