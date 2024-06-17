@@ -15762,42 +15762,61 @@ function appendText(task, geom, styles) {
   textDiv.setAttribute("role", "presentation");
 
 
-  // 強調表示する単語とリンクの配列
-  const targetWords = [
-    { word: "3-2-3-3", url: "./viewer.html?file=./pdf/ministry_comdoc.pdf#page=203" },
-    { word: "3-2-4-3", url: "./viewer.html?file=./pdf/ministry_comdoc.pdf#page=240" },
-    { word: "3-2-3-4", url: "./viewer.html?file=./pdf/ministry_comdoc.pdf#page=205" },
-    { word: "3-2-4-2", url: "./viewer.html?file=./pdf/ministry_comdoc.pdf#page=239" },
-    { word: "3-2-3-20", url: "./viewer.html?file=./pdf/ministry_comdoc.pdf#page=219" }
-  ];
+// 強調表示する単語とリンクの配列
+const targetWords = [
+  { word: "3-2-3-3", url: "./viewer.html?file=./pdf/ministry_comdoc.pdf#page=203" },
+  { word: "3-2-4-3", url: "./viewer.html?file=./pdf/ministry_comdoc.pdf#page=240" },
+  { word: "3-2-3-4", url: "./viewer.html?file=./pdf/ministry_comdoc.pdf#page=205" },
+  { word: "3-2-4-2", url: "./viewer.html?file=./pdf/ministry_comdoc.pdf#page=239" },
+  { word: "3-2-3-20", url: "./viewer.html?file=./pdf/ministry_comdoc.pdf#page=219" }
+];
 
-  // 強調表示する単語ごとに処理
-  targetWords.forEach(target => {
-    if (geom.str.includes(target.word)) {
-      const parts = geom.str.split(new RegExp(`(${target.word})`, 'g'));
-      parts.forEach((part, index) => {
-        const span = document.createElement("span");
-        if (part === target.word) {
-          span.style.borderBottom = "5px solid blue"; // 太い青い下線を追加
-          // span.style.backgroundColor = "yellow"; // 黄色のマーカー線を追加
-          span.style.cursor = "pointer"; // カーソルをポインターに変更
-          span.onclick = () => window.location.href = target.url; // リンク先を設定
-          span.textContent = part;
-        } else {
-          span.textContent = part;
-        }
-        span.style.position = "relative"; // 相対位置を使用
-        span.style.left = `${index === 0 ? 0 : 'auto'}`; // 最初の部分だけ左をリセット
-        span.style.top = "0"; // 上の位置をリセット
-        textDiv.appendChild(span);
-      });
-      geom.str = ""; // 処理済みの文字列をクリア
-    }
-  });
+// 強調表示する単語ごとに処理
+targetWords.forEach(target => {
+  if (geom.str.includes(target.word)) {
+    const parts = geom.str.split(new RegExp(`(${target.word})`, 'g'));
+    parts.forEach((part, index) => {
+      const span = document.createElement("span");
+      if (part === target.word) {
+        span.style.borderBottom = "5px solid blue"; // 太い青い下線を追加
+        span.style.cursor = "pointer"; // カーソルをポインターに変更
+        span.onclick = () => window.location.href = target.url; // リンク先を設定
+        span.textContent = part;
 
-  if (geom.str !== "") {
-    textDiv.textContent = geom.str;
+        // アイコン要素を作成
+        const icon = document.createElement("img");
+        icon.src = "../icon.svg"; // アイコン画像のパスを設定
+        icon.alt = "Icon"; // 代替テキストを設定
+        icon.style.position = "absolute"; // 絶対位置に設定
+        icon.style.left = "0px"; // キーワードの右に配置
+        icon.style.top = "20px"; // キーワードの上に少しずらして配置
+        icon.style.cursor = "pointer"; // カーソルをポインターに変更
+        icon.style.width = "20px"; // アイコンの幅を設定
+        icon.style.height = "20px"; // アイコンの高さを設定
+        icon.style.opacity = "1"; // 透明度を完全に不透明に設定
+        icon.style.zIndex = "1000"; // 他の要素の上に表示
+        icon.onclick = () => window.location.href = target.url; // リンク先を設定
+
+        span.style.position = "relative"; // spanの位置を相対位置に設定
+        span.appendChild(icon); // spanにアイコンを追加
+      } else {
+        span.textContent = part;
+      }
+      span.style.position = "relative"; // 相対位置を使用
+      span.style.left = `${index === 0 ? 0 : 'auto'}`; // 最初の部分だけ左をリセット
+      span.style.top = "0"; // 上の位置をリセット
+      textDiv.appendChild(span);
+    });
+    geom.str = ""; // 処理済みの文字列をクリア
   }
+});
+
+if (geom.str !== "") {
+  textDiv.textContent = geom.str;
+}
+
+
+
   
   textDiv.dir = geom.dir;
   if (task._fontInspectorEnabled) {
