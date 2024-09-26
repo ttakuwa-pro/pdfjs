@@ -14979,7 +14979,9 @@ class XfaLayerBuilder {
     this.div.hidden = true;
   }
 }
-
+PDFViewerApplication.pdfViewer.getPageView(0).pdfPage.getAnnotations().then(function(annotations) {
+  console.log(annotations);
+});
 __webpack_async_result__();
 } catch(e) { __webpack_async_result__(e); } });
 
